@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const { log } = require('console');
 
 const app = express();
 
@@ -51,11 +52,19 @@ app.post("/api/register", (req, res)=>{
         fs.readFile(fileName, (err, data)=>{
             let stringData = data.toString();
             let credFile = JSON.parse(stringData);
-            userInfo.id = credFile.length + 1;
-            console.log(userInfo);
+            // userInfo.id = credFile.length + 1;
+            // console.log(userInfo);
 
-            //Pushing new user into credentials
-            credFile.push(userInfo);
+            //Checking data and inserting Id
+            if(credFile.length == 0){
+                userInfo.id = 1;
+                credFile.push(userInfo);    
+            } else{
+                let lastElement = credFile[credFile.length - 1];
+                userInfo.id = lastElement.id + 1;
+                credFile.push(userInfo);
+            }
+
             //Converting file to json
             stringData = JSON.stringify(credFile);
             fs.writeFile(fileName, stringData, (err)=>{
